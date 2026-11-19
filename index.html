@@ -12,7 +12,7 @@ button.red{background:#ef4444}
 button.green{background:#22c55e}
 .hidden{display:none}
 table{width:100%;background:white;color:black;border-radius:10px;font-size:14px}
-td,th{padding:8px;border-bottom:1px solid #ddd}
+td,th{padding:8px;border-bottom:1px solid #ddd;word-break:break-all}
 </style>
 </head>
 <body>
@@ -20,60 +20,87 @@ td,th{padding:8px;border-bottom:1px solid #ddd}
 <h1>FOUNDER DASHBOARD</h1>
 <p>Only Clinton - INCREDIBLE VPN Founder</p>
 
-<!-- LOGIN -->
 <div id="login" class="card">
 <h2>Founder Login</h2>
 <input type="password" id="pin" placeholder="Enter Founder Password">
 <button onclick="login()">Enter Dashboard</button>
-<p style="font-size:12px">Default Password: Clinton123 - You go change am later</p>
+<p style="font-size:12px">Default Password: Clinton123</p>
 </div>
 
-<!-- DASHBOARD -->
 <div id="dash" class="card hidden">
 <h2>Welcome Founder 👋</h2>
 <p>Total Joined: <b id="total">0</b></p>
 <p>Total Paid: <b id="paid">0</b></p>
 <p>Total Money in Wallet: <b>₦<span id="money">0</span></b></p>
 
-<h3>People Wey Join</h3>
+<h3>Servers Wey Dey Live</h3>
+<table>
+<tr><th>Name</th><th>Country</th><th>Config</th></tr>
+<tbody id="serverList"><tr><td colspan="3">Loading servers...</td></tr></tbody>
+</table>
+
+<h3 style="margin-top:20px">People Wey Join</h3>
 <table>
 <tr><th>Email</th><th>Country</th><th>Action</th></tr>
 <tbody id="list"></tbody>
 </table>
 
-<button class="green" onclick="alert('To withdraw: Open your Opay app - Check balance - Transfer to your bank. Money from Premium payments will show there.')">Withdraw Money to Opay / Bank</button>
-<button onclick="alert('Payment Method: Users pay via Opay Transfer to Founder. You confirm payment for them inside WhatsApp, then you click Paid for them here.')">How To Accept Payment</button>
-<button class="red" onclick="show('login');document.getElementById('dash').classList.add('hidden')">Log Out</button>
+<button class="green" onclick="alert('To withdraw: Open your Opay app - Check balance - Transfer to your bank.')">Withdraw Money to Opay / Bank</button>
+<button onclick="alert('Users pay via Opay Transfer to Founder. You confirm for them inside WhatsApp, then you click Paid here.')">How To Accept Payment</button>
+<button class="red" onclick="document.getElementById('dash').classList.add('hidden');document.getElementById('login').classList.remove('hidden')">Log Out</button>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAIYj_atzKHGiooyHkGCP3W6NIJ9GL7EMg",
+  authDomain: "incredible-vpn.firebaseapp.com",
+  projectId: "incredible-vpn",
+  storageBucket: "incredible-vpn.firebasestorage.app",
+  messagingSenderId: "700305194097",
+  appId: "1:700305194097:web:23a0461e47cc97a09e6fd0",
+  measurementId: "G-N6NB4EVQCX"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
 function login(){
   var p=document.getElementById('pin').value;
   if(p==="Clinton123"){
     document.getElementById('login').classList.add('hidden');
     document.getElementById('dash').classList.remove('hidden');
     loadUsers();
+    loadServers();
   } else { alert('Wrong Founder Password'); }
 }
+async function loadServers(){
+  try{
+    let snap = await db.collection("servers").get();
+    let html="";
+    snap.forEach(doc=>{
+      let s = doc.data();
+      html += "<tr><td>"+(s.name||"")+"</td><td>"+(s.country||"")+" "+(s.flag||"")+"</td><td>"+(s.config||"")+"</td></tr>";
+    });
+    if(!html) html="<tr><td colspan='3'>No servers yet - Add for Firebase</td></tr>";
+    document.getElementById('serverList').innerHTML=html;
+  }catch(e){ document.getElementById('serverList').innerHTML="<tr><td colspan='3'>Error: "+e.message+" - Check Firestore Rules</td></tr>"; }
+}
 function loadUsers(){
-  // For now, this reads demo users saved in this browser.
-  // After we connect Firebase, this will show REAL users from all phones.
-  var users = JSON.parse(localStorage.getItem('vpn_users')||'[]');
-  document.getElementById('total').innerText = users.length;
-  var html="";
-  users.forEach(function(u,i){
-    html += "<tr><td>"+u.email+"</td><td>"+u.country+"</td><td><button style='padding:5px;background:red' onclick='removeUser("+i+")'>Block</button></td></tr>";
-  });
-  if(!html) html="<tr><td colspan='3'>No users yet - After Firebase, real users go show here</td></tr>";
-  document.getElementById('list').innerHTML=html;
+  db.collection("users").get().then(snap=>{
+    document.getElementById('total').innerText = snap.size;
+    let html="";
+    snap.forEach(doc=>{
+      let u = doc.data();
+      html += "<tr><td>"+(u.email||"")+"</td><td>"+(u.country||"")+"</td><td><button style='padding:5px;background:red;color:white;border:none;border-radius:5px' onclick=\"removeUser('"+doc.id+"')\">Block</button></td></tr>";
+    });
+    if(!html) html="<tr><td colspan='3'>No users yet - share your app link</td></tr>";
+    document.getElementById('list').innerHTML=html;
+  }).catch(e=>{ document.getElementById('list').innerHTML="<tr><td colspan='3'>Error: "+e.message+"</td></tr>"; });
 }
-function removeUser(i){
-  var users = JSON.parse(localStorage.getItem('vpn_users')||'[]');
-  users.splice(i,1);
-  localStorage.setItem('vpn_users',JSON.stringify(users));
-  loadUsers();
+function removeUser(id){
+  db.collection("users").doc(id).delete().then(()=>loadUsers());
 }
-function show(id){document.getElementById(id).classList.remove('hidden')}
 </script>
 </body>
 </html>
