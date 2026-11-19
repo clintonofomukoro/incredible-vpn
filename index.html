@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INCREDIBLE VPN</title>
+<style>
+body{background:#0a0a2e;color:white;font-family:Arial;text-align:center;padding:20px}
+.card{background:#1a1a4a;padding:20px;border-radius:15px;margin:15px auto;max-width:400px}
+input,select{width:90%;padding:12px;margin:8px;border-radius:8px;border:none}
+button{background:#7b2ff7;color:white;padding:14px 20px;border:none;border-radius:10px;width:95%;font-size:16px;margin:8px;cursor:pointer}
+.warn{background:#ffcc00;color:black;padding:12px;border-radius:10px;font-size:13px}
+.hidden{display:none}
+.green{color:#00ff88}
+</style>
+</head>
+<body>
+
+<h1>INCREDIBLE VPN</h1>
+<p>Final Version - No ADS - Founder Earn Hidden</p>
+
+<!-- CREATE ACCOUNT -->
+<div id="signup" class="card">
+<h2>Create Account</h2>
+<input id="email" type="email" placeholder="Email - Must be correct">
+<input id="pin" type="password" maxlength="5" placeholder="Password - 5-Digit PIN">
+<label><input type="checkbox" id="robot"> I'm Not A Robot</label>
+<div class="warn"><b>IMPORTANT WARNING:</b><br>Make sure you put your ACTUAL Country and State you are from. This is NOT for VPN connection. This is to identify you for FUTURE PURPOSE. Do NOT put United States if you are in Nigeria. Put your REAL current Country and State.</div>
+<select id="country"><option value="">What Country Are You From?</option><option>Nigeria</option><option>Ghana</option><option>South Africa</option><option>Cameroon</option><option>Morocco</option><option>Philippines</option><option>Brazil</option><option>United States</option><option>United Kingdom</option></select>
+<select id="state"><option value="">What State Are You From?</option><option>Lagos</option><option>Delta</option><option>Abuja</option><option>Warri</option><option>Accra</option><option>Other</option></select>
+<button onclick="signup()">Create Account</button>
+<p id="signupMsg"></p>
+</div>
+
+<!-- LOGIN -->
+<div id="login" class="card hidden">
+<h2>Login</h2>
+<input id="loginEmail" type="email" placeholder="Email">
+<input id="loginPin" type="password" maxlength="5" placeholder="5-Digit PIN">
+<button onclick="login()">Login</button>
+<p id="loginMsg"></p>
+</div>
+
+<!-- HOME -->
+<div id="home" class="card hidden">
+<h2>Welcome to INCREDIBLE VPN</h2>
+<p>Free Days Left: <b id="days">4</b></p>
+<p>Status: <span id="status" class="green">FREE MODE - Connected Ready</span></p>
+<button onclick="connect()">CONNECT VPN</button>
+<p id="connectMsg"></p>
+<p>Founder Earn: <span id="earn">0</span> - Hidden</p>
+<button onclick="showPrice()">CONTINUE - After Free Expired</button>
+</div>
+
+<!-- PRICE -->
+<div id="price" class="card hidden">
+<h2>FREE MODE EXPIRED</h2>
+<p>You Need To Pay Or Subscribe Or Upgrade To PRO MODE</p>
+<h3 id="priceTitle">Price - Your Currency</h3>
+<p>Weekly (2 Weeks): <b id="p1">90</b></p>
+<p>Monthly (2 Months): <b id="p2">180</b> - 2x Weekly</p>
+<p>Six Months: <b id="p3">270</b> - 3x Weekly</p>
+<p>Yearly: <b id="p4">810</b> - 3x Six Months</p>
+<p>Payment: Online Bank | Card | USSD / Other</p>
+<p>Money goes to INCREDIBLE VPN Wallet - Auto-convert to Naira</p>
+<button onclick="pay()">PAY NOW</button>
+<p id="payMsg"></p>
+</div>
+
+<!-- FOUNDER WALLET -->
+<div id="wallet" class="card hidden">
+<h2>INCREDIBLE VPN Wallet - Founder Only</h2>
+<p>Total Users Joined: <b id="users">1</b></p>
+<p>Earn Per Join: <b id="earnJoin">+1</b></p>
+<p>Earn Per Data Use To Connect: <b id="earnData">+1</b></p>
+<p>Earn % Per Install Data: <b id="earnInstall">+5%</b></p>
+<p>Total Founder Earn: <b id="totalEarn">0</b></p>
+<p>Withdraw To: Any Nigerian Bank - Founder Chooses</p>
+<button>ACCEPT</button> <button>BLOCK</button>
+</div>
+
+<script>
+let savedEmail="", savedPin="", earn=0, users=1;
+function signup(){
+  let e=document.getElementById('email').value;
+  let p=document.getElementById('pin').value;
+  let c=document.getElementById('country').value;
+  let s=document.getElementById('state').value;
+  let r=document.getElementById('robot').checked;
+  if(!e||p.length!==5||!c||!s||!r){document.getElementById('signupMsg').innerText="MISSING INFORMATION - Fill Everything Correctly";return;}
+  savedEmail=e; savedPin=p;
+  // Founder Earn Per Join + Per Install % - Hidden
+  earn+=5; users+=0;
+  document.getElementById('signupMsg').innerText="Account Created! Founder Earn +5% Install Data Added To Wallet";
+  document.getElementById('signup').classList.add('hidden');
+  document.getElementById('login').classList.remove('hidden');
+}
+function login(){
+  let e=document.getElementById('loginEmail').value;
+  let p=document.getElementById('loginPin').value;
+  if(e!==savedEmail||p!==savedPin){document.getElementById('loginMsg').innerText="Email Not Correct / Password Not Correct";return;}
+  document.getElementById('login').classList.add('hidden');
+  document.getElementById('home').classList.remove('hidden');
+  document.getElementById('wallet').classList.remove('hidden');
+  document.getElementById('earn').innerText=earn;
+  document.getElementById('totalEarn').innerText=earn;
+}
+function connect(){
+  // Founder Earn Per Data Use To Connect - No ADS
+  earn+=2;
+  document.getElementById('connectMsg').innerText="VPN Connected! No ADS. Founder Earn +2 For Data Use";
+  document.getElementById('earn').innerText=earn;
+  document.getElementById('totalEarn').innerText=earn;
+  let d=parseInt(document.getElementById('days').innerText);
+  if(d>0) document.getElementById('days').innerText=d-1;
+  if(d-1<=0){document.getElementById('status').innerText="FREE MODE EXPIRED - You Need To Pay"; }
+}
+function showPrice(){
+  document.getElementById('home').classList.add('hidden');
+  document.getElementById('price').classList.remove('hidden');
+  let c=document.getElementById('country').value;
+  if(c==="United States"){document.getElementById('priceTitle').innerText="Price - Dollar $"; document.getElementById('p1').innerText="$90"; document.getElementById('p2').innerText="$180"; document.getElementById('p3').innerText="$270"; document.getElementById('p4').innerText="$810";}
+  else if(c==="Nigeria"||c==="Ghana"||c==="South Africa"||c==="Cameroon"||c==="Morocco"||c==="Philippines"||c==="Brazil"){document.getElementById('p1').innerText="1,000"; document.getElementById('p2').innerText="2,000"; document.getElementById('p3').innerText="3,000"; document.getElementById('p4').innerText="9,000";}
+  else{document.getElementById('p1').innerText="1,001 - 1,500"; document.getElementById('p2').innerText="2,002 - 3,000"; document.getElementById('p3').innerText="3,003 - 4,500"; document.getElementById('p4').innerText="9,009 - 13,500";}
+}
+function pay(){document.getElementById('payMsg').innerText="Payment Goes To INCREDIBLE VPN Wallet - Auto-Convert To Naira - Founder Can ACCEPT / BLOCK";}
+</script>
+</body>
+</html>
