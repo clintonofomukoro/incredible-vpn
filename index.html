@@ -1,106 +1,59 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FOUNDER - INCREDIBLE VPN</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Founder sign-in • INCREDIBLE VPN</title>
 <style>
-body{background:#0b0b2e;color:white;font-family:Arial;padding:20px;text-align:center}
-.card{background:#1a1a4a;padding:20px;border-radius:20px;max-width:500px;margin:20px auto}
-input{width:100%;padding:14px;margin:8px 0;border-radius:10px;border:none}
-button{width:100%;padding:14px;border:none;border-radius:12px;background:#7c3aed;color:white;font-size:17px;margin-top:10px}
-button.red{background:#ef4444}
-button.green{background:#22c55e}
-.hidden{display:none}
-table{width:100%;background:white;color:black;border-radius:10px;font-size:14px}
-td,th{padding:8px;border-bottom:1px solid #ddd;word-break:break-all}
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:linear-gradient(145deg,#090d2d,#31216b);font:16px Arial,sans-serif;color:#fff;display:grid;place-items:center;padding:20px}.card{width:min(100%,520px);background:#151b43;border:1px solid #45417b;border-radius:22px;padding:26px;box-shadow:0 18px 60px #0006}h1{text-align:center;font-size:25px}p{color:#cbd0ee;line-height:1.5}input,button{width:100%;padding:14px;border-radius:11px;margin-top:12px;font-size:16px}input{background:#0b1030;border:1px solid #50578c;color:white}button{background:#7855ee;color:white;border:0;font-weight:bold}button:disabled{opacity:.5}#status{min-height:24px;color:#ffd28a}.hidden{display:none}.metric{padding:13px;background:#0b1030;border-radius:12px;margin:10px 0}.small{font-size:13px;text-align:center;color:#aeb6df}table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:9px;border-bottom:1px solid #41466e;text-align:left;overflow-wrap:anywhere}
 </style>
 </head>
-<body>
-<img src="logo.png" style="width:100px;height:100px;border-radius:50%">
-<h1>FOUNDER DASHBOARD</h1>
-<p>Only Clinton - INCREDIBLE VPN Founder</p>
-
-<div id="login" class="card">
-<h2>Founder Login</h2>
-<input type="password" id="pin" placeholder="Enter Founder Password">
-<button onclick="login()">Enter Dashboard</button>
-<p style="font-size:12px">Default Password: Clinton123</p>
-</div>
-
-<div id="dash" class="card hidden">
-<h2>Welcome Founder 👋</h2>
-<p>Total Joined: <b id="total">0</b></p>
-<p>Total Paid: <b id="paid">0</b></p>
-<p>Total Money in Wallet: <b>₦<span id="money">0</span></b></p>
-
-<h3>Servers Wey Dey Live</h3>
-<table>
-<tr><th>Name</th><th>Country</th><th>Config</th></tr>
-<tbody id="serverList"><tr><td colspan="3">Loading servers...</td></tr></tbody>
-</table>
-
-<h3 style="margin-top:20px">People Wey Join</h3>
-<table>
-<tr><th>Email</th><th>Country</th><th>Action</th></tr>
-<tbody id="list"></tbody>
-</table>
-
-<button class="green" onclick="alert('To withdraw: Open your Opay app - Check balance - Transfer to your bank.')">Withdraw Money to Opay / Bank</button>
-<button onclick="alert('Users pay via Opay Transfer to Founder. You confirm for them inside WhatsApp, then you click Paid here.')">How To Accept Payment</button>
-<button class="red" onclick="document.getElementById('dash').classList.add('hidden');document.getElementById('login').classList.remove('hidden')">Log Out</button>
-</div>
-
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyAIYj_atzKHGiooyHkGCP3W6NIJ9GL7EMg",
-  authDomain: "incredible-vpn.firebaseapp.com",
-  projectId: "incredible-vpn",
-  storageBucket: "incredible-vpn.firebasestorage.app",
-  messagingSenderId: "700305194097",
-  appId: "1:700305194097:web:23a0461e47cc97a09e6fd0",
-  measurementId: "G-N6NB4EVQCX"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-function login(){
-  var p=document.getElementById('pin').value;
-  if(p==="Clinton123"){
-    document.getElementById('login').classList.add('hidden');
-    document.getElementById('dash').classList.remove('hidden');
-    loadUsers();
-    loadServers();
-  } else { alert('Wrong Founder Password'); }
+<body><main class="card">
+<h1>INCREDIBLE VPN<br>FOUNDER ACCESS</h1>
+<section id="login">
+<p>This page is restricted to the Founder account. Sign in with the Founder email and password created in Firebase Authentication.</p>
+<form id="loginForm"><input id="email" type="email" autocomplete="username" placeholder="Founder email" required><input id="password" type="password" autocomplete="current-password" placeholder="Password" required><button id="signIn" type="submit">Secure sign in</button></form>
+<p id="status" role="status"></p>
+<p class="small">No shared or default password is stored in this website.</p>
+</section>
+<section id="dashboard" class="hidden">
+<p id="welcome">Founder access verified.</p>
+<div class="metric">Registered accounts: <b id="total">—</b></div>
+<div class="metric">Paid accounts: <b id="paid">—</b></div>
+<div class="metric">Founder wallet: <b id="wallet">Not connected to verified payments</b></div>
+<h3>Recent accounts</h3><div style="overflow:auto"><table><thead><tr><th>Email</th><th>Country</th></tr></thead><tbody id="users"><tr><td colspan="2">Loading…</td></tr></tbody></table></div>
+<h3>Server directory</h3><div style="overflow:auto"><table><thead><tr><th>Server</th><th>Country</th><th>Status</th></tr></thead><tbody id="servers"><tr><td colspan="3">Loading…</td></tr></tbody></table></div>
+<p id="dashStatus"></p><button id="logout">Sign out</button>
+</section>
+</main>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const firebaseConfig={apiKey:"AIzaSyAIYj_atzKHGiooyHkGCP3W6NIJ9GL7EMg",authDomain:"incredible-vpn.firebaseapp.com",projectId:"incredible-vpn",storageBucket:"incredible-vpn.firebasestorage.app",messagingSenderId:"700305194097",appId:"1:700305194097:web:23a0461e47cc97a09e6fd0"};
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
+const $=id=>document.getElementById(id);
+function status(message){$("status").textContent=message}
+$("loginForm").addEventListener("submit",async e=>{e.preventDefault();$("signIn").disabled=true;status("Signing in…");try{await signInWithEmailAndPassword(auth,$("email").value.trim(),$("password").value)}catch(err){status(err.code==="auth/invalid-credential"?"Email or password is incorrect.":err.message)}finally{$("signIn").disabled=false}});
+onAuthStateChanged(auth,async user=>{
+ $("dashboard").classList.add("hidden");$("login").classList.remove("hidden");
+ if(!user)return;
+ try{
+   const role=await getDoc(doc(db,"users",user.uid));
+   if(!role.exists()||role.data().role!=="founder"){await signOut(auth);status("This account is not authorized as Founder.");return}
+   $("login").classList.add("hidden");$("dashboard").classList.remove("hidden");$("welcome").textContent="Signed in as "+(user.email||"Founder");
+   await loadData();
+ }catch(err){$("dashStatus").textContent="Access denied or database rules need setup: "+err.message;await signOut(auth)}
+});
+async function loadData(){
+ const snap=await getDocs(query(collection(db,"users"),limit(100)));
+ $("total").textContent=snap.size;
+ let paid=0,rows=[];
+ snap.forEach(d=>{const u=d.data();if(u.subscriptionStatus==="active"||u.paid===true)paid++;if(rows.length<15){const tr=document.createElement("tr"),a=document.createElement("td"),b=document.createElement("td");a.textContent=u.email||"—";b.textContent=u.country||"—";tr.append(a,b);rows.push(tr)}});
+ $("paid").textContent=paid;$("users").replaceChildren(...rows);
+ const serverSnap=await getDocs(query(collection(db,"servers"),limit(50)));const serverRows=[];
+ serverSnap.forEach(d=>{const s=d.data(),tr=document.createElement("tr");for(const v of [s.name||"—",s.country||"—",s.status||"Unverified"]) {const td=document.createElement("td");td.textContent=v;tr.append(td)}serverRows.push(tr)});
+ $("servers").replaceChildren(...serverRows);
+ $("dashStatus").textContent="Account and server records loaded. Payment totals and withdrawals require verified payment-provider integration.";
 }
-async function loadServers(){
-  try{
-    let snap = await db.collection("servers").get();
-    let html="";
-    snap.forEach(doc=>{
-      let s = doc.data();
-      html += "<tr><td>"+(s.name||"")+"</td><td>"+(s.country||"")+" "+(s.flag||"")+"</td><td>"+(s.config||"")+"</td></tr>";
-    });
-    if(!html) html="<tr><td colspan='3'>No servers yet - Add for Firebase</td></tr>";
-    document.getElementById('serverList').innerHTML=html;
-  }catch(e){ document.getElementById('serverList').innerHTML="<tr><td colspan='3'>Error: "+e.message+" - Check Firestore Rules</td></tr>"; }
-}
-function loadUsers(){
-  db.collection("users").get().then(snap=>{
-    document.getElementById('total').innerText = snap.size;
-    let html="";
-    snap.forEach(doc=>{
-      let u = doc.data();
-      html += "<tr><td>"+(u.email||"")+"</td><td>"+(u.country||"")+"</td><td><button style='padding:5px;background:red;color:white;border:none;border-radius:5px' onclick=\"removeUser('"+doc.id+"')\">Block</button></td></tr>";
-    });
-    if(!html) html="<tr><td colspan='3'>No users yet - share your app link</td></tr>";
-    document.getElementById('list').innerHTML=html;
-  }).catch(e=>{ document.getElementById('list').innerHTML="<tr><td colspan='3'>Error: "+e.message+"</td></tr>"; });
-}
-function removeUser(id){
-  db.collection("users").doc(id).delete().then(()=>loadUsers());
-}
-</script>
-</body>
-</html>
+$("logout").addEventListener("click",()=>signOut(auth));
+</script></body></html>
