@@ -1,0 +1,35 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+    function isFounder() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') == 'founder';
+    }
+
+    match /users/{userId} {
+      allow read: if signedIn() && (request.auth.uid == userId || isFounder());
+      allow create: if signedIn()
+        && request.auth.uid == userId
+        && request.resource.data.get('role', 'user') == 'user';
+      allow update: if isFounder() || (
+        signedIn()
+        && request.auth.uid == userId
+        && request.resource.data.get('role', '') == resource.data.get('role', '')
+      );
+      allow delete: if isFounder();
+    }
+
+    match /servers/{serverId} {
+      allow read: if signedIn();
+      allow write: if isFounder();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
