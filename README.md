@@ -1,28 +1,47 @@
-# INCREDIBLE VPN — Android starter project
+# INCREDIBLE VPN
 
-This is a **starter project**, not a finished VPN product.
+Android app preview and Founder web dashboard.
 
-## Included
-- Android application skeleton using Kotlin and Jetpack Compose
-- Package name: `com.incrediblevpn.app`
-- Initial home-screen visual prototype based on the supplied design
-- Firebase Auth and Firestore dependencies prepared
+## Build
+The GitHub Actions workflow builds a **debug APK** and uploads it as a short-lived workflow artifact. This is a test app, not a production VPN.
 
-## Required Firebase setup
-1. In Firebase Console, register the Android app with package name `com.incrediblevpn.app`.
-2. Download `google-services.json`.
-3. Place it in this project's `app/` folder (same level as `app/build.gradle.kts`).
-4. In Firebase Console, enable Authentication providers and create Firestore only after setting secure rules.
+## Founder dashboard security
+- Founder sign-in uses Firebase Authentication, not a hardcoded website password.
+- A signed-in user is granted Founder UI access only when Firestore document `users/{uid}` contains `role: "founder"`.
+- This client check is supplementary. Apply the Firestore rules below so authorization is enforced by Firebase on every read; never rely on hiding a web page.
+- Remove the previous shared password from circulation and use Firebase password reset to establish a new private credential.
+- Configure the Founder user document manually in Firebase Console, with the UID of the one Founder account.
 
-Do not upload `google-services.json` to public repositories. Never put service-account keys or server secrets in the Android app.
+Example Firestore rules (replace the project-wide rules only after reviewing your existing app data model):
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isFounder() {
+      return signedIn() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'founder';
+    }
+    match /users/{userId} {
+      allow read: if signedIn() && (request.auth.uid == userId || isFounder());
+      allow create: if signedIn() && request.auth.uid == userId;
+      allow update: if signedIn() && (request.auth.uid == userId || isFounder());
+      allow delete: if isFounder();
+    }
+    match /servers/{serverId} {
+      allow read: if signedIn();
+      allow write: if isFounder();
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+```
+IMPORTANT: The rules above are a template. Review existing collections and test user self-update fields; do not allow users to set or edit their own `role`.
 
-## Important limitations
-- The connect button is a visual demo. **It does not create a VPN tunnel.**
-- No WireGuard server, VPN key provisioning, Android VpnService, kill switch, IP verification, speed measurement, subscriptions, payments, ads, or founder wallet is implemented yet.
-- Firebase dependencies are included, but authentication and database operations are not yet wired.
-- The five-digit PIN requirement must be implemented with strong server-side protections; do not store a PIN as plaintext or use it as the only security control.
-- Do not claim earnings from installs, registrations, connections, or mobile-data use unless a real sponsor, advertiser, referral partner, or paying customer has paid for that activity.
-- Android direct APK distribution requires a signed APK and user approval to install. iOS distribution is different.
-
-## Build requirements
-Use Android Studio or a compatible Android Gradle environment with JDK 17 and Android SDK 35. A mobile IDE may not support every Gradle plugin or dependency; if it fails, a compatible build environment will be needed.
+## Current limitations
+- APK button is a visual demo. No Android VpnService, WireGuard tunnel, VPN server, key provisioning, kill switch, or traffic routing is implemented.
+- Authentication for the Founder page requires Firebase Authentication to be enabled and the Founder UID/role document to be provisioned.
+- The Founder dashboard reports account data only. Payments, earnings, and withdrawals are not real until a payment provider and trusted server-side verification are integrated.
+- Do not publish Firebase service-account keys or private server credentials.
